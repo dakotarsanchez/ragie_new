@@ -19,6 +19,9 @@ class RAGAgent:
             print("No API key found")
             return []
 
+        # Print first few characters of API key for debugging
+        print(f"API key starts with: {self.api_key[:10]}...")
+        
         url = "https://api.ragie.ai/documents?page_size=3&filter=%7B%22folder%22%3A%20%7B%22%24eq%22%3A%20%22test_meetings%22%7D%7D"
         
         headers = {
@@ -27,7 +30,7 @@ class RAGAgent:
         }
 
         print(f"Making request to URL: {url}")
-        print(f"Headers (excluding auth token): {{'accept': {headers['accept']}}}")
+        print(f"Full headers: {headers}")  # Be careful not to log this in production
 
         try:
             response = requests.get(url, headers=headers)
