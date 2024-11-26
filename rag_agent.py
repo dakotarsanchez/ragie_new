@@ -95,8 +95,8 @@ class RAGAgent:
             description="Routes queries to the appropriate category"
         )
     
-    def _route_query(self, query: str) -> List[Dict]:
-        """Save and print the user query for confirmation."""
+    def _route_query(self, query: str) -> str:
+        """Save and return the user query for confirmation."""
         try:
             # Save the query to a variable
             self.last_query = query
@@ -104,13 +104,13 @@ class RAGAgent:
             # Print the query to confirm it is passed correctly
             print(f"Received query: {self.last_query}")
             
-            # Return an empty list as no processing is done
-            return []
+            # Return the query
+            return self.last_query
 
         except Exception as e:
             print(f"Error during query handling: {str(e)}")
             st.error("An error occurred while processing the query. Please try again later.")
-            return []
+            return ""
 
     def get_recent_meeting_summaries(self) -> List[Dict]:
         """Fetch and process the 3 most recent meeting summaries."""
