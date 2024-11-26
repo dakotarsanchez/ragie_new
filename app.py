@@ -22,8 +22,7 @@ def main():
                 for meeting in meetings:
                     with st.expander(f"Meeting: {meeting.get('name', 'Untitled')}"):
                         st.write(f"ID: {meeting.get('id')}")
-                        st.write(f"Created: {meeting.get('created_at')}")
-                        st.write(f"Updated: {meeting.get('updated_at')}")
+                        st.write(f"Summary: {meeting.get('summary', 'No summary available')}")
             else:
                 st.warning("No meetings found or error occurred while fetching meetings.")
 
