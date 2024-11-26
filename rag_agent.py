@@ -38,6 +38,15 @@ class RAGAgent:
                 tools=[self._create_analysis_tool()]
             )
             
+            # Create the routing agent
+            self.routing_agent = Agent(
+                role='Query Router',
+                goal='Determine the intent of user queries and route them appropriately',
+                backstory='Expert in understanding user intent and categorizing queries',
+                llm=self.llm,
+                tools=[self._create_routing_tool()]
+            )
+            
         except Exception as e:
             st.error(f"Error initializing agents: {str(e)}")
             self.ragie_api_key = None
@@ -64,6 +73,23 @@ class RAGAgent:
             ),
             description="Analyzes and structures content"
         )
+
+    def _create_routing_tool(self):
+        """Create a tool for routing queries."""
+        return Tool(
+            name="route_query",
+            func=lambda query: self._route_query(query),
+            description="Routes queries to the appropriate category"
+        )
+    
+    def _route_query(self, query: str) -> str:
+        """Determine the intent of the query and print it."""
+        intent = self.llm.predict(
+            f"""Determine if this query is about meeting transcripts or client agreements. 
+            Respond with 'test_meeting', 'test_client_agreements', or 'both' if unclear: {query}"""
+        )
+        print(f"Predicted intent: {intent}")
+        return intent if intent in ['test_meeting', 'test_client_agreements'] else 'both'
 
     def get_recent_meeting_summaries(self) -> List[Dict]:
         """Fetch and process the 3 most recent meeting summaries."""
