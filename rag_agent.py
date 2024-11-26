@@ -98,7 +98,9 @@ class RAGAgent:
     def _route_query(self, query: str) -> List[Dict]:
         """Determine the intent of the query and delegate to the appropriate agent(s)."""
         try:
-            intent = self.llm.predict(
+            # Use a different method from the LLM instance to evaluate the query
+            # Assuming there's a method like `evaluate` or similar
+            intent = self.llm.evaluate(
                 f"""Determine if this query is about meeting transcripts or client agreements. 
                 Respond with exactly one of the following: 'test_meeting', 'test_client_agreements', or 'Query category not recognized. Please refine your query.' 
                 Do not provide any additional text or explanation. Query: {query}"""
@@ -121,9 +123,7 @@ class RAGAgent:
             return meeting_chunks + agreement_chunks
 
         except Exception as e:
-            print(f"Error during LLM prediction: {str(e)}")
-            print("Exception type:", type(e))
-            print("Exception args:", e.args)
+            print(f"Error during LLM evaluation: {str(e)}")
             st.error("An error occurred while processing the query. Please try again later.")
             return []
 
