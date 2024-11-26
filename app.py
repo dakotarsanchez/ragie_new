@@ -36,6 +36,14 @@ def main():
                             st.warning("No summary available for this meeting")
             else:
                 st.warning("No meetings found or error occurred while fetching meetings.")
+    
+    # Add a text input box for user queries
+    user_query = st.text_input("Ask a question about the meeting summaries:")
+    
+    # Add a button to submit the query
+    if st.button("Submit Query"):
+        st.write("Query submitted:", user_query)
+        # Backend logic to handle the query will be added here
 
 if __name__ == "__main__":
     main()
