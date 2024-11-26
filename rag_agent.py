@@ -100,14 +100,11 @@ class RAGAgent:
                 return self.meeting_script_agent.retrieve_chunks()
             elif intent == 'test_client_agreements':
                 return self.client_agreement_agent.retrieve_chunks()
-            elif intent == 'both':
-                # Engage both agents and combine their results
+            else:
+                # Treat any unexpected intent as 'both'
                 meeting_chunks = self.meeting_script_agent.retrieve_chunks()
                 agreement_chunks = self.client_agreement_agent.retrieve_chunks()
                 return meeting_chunks + agreement_chunks
-            else:
-                # Handle unexpected intent
-                return []
         except Exception as e:
             print(f"Error during LLM prediction: {str(e)}")
             st.error("An error occurred while processing the query. Please try again later.")
