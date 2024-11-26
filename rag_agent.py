@@ -104,13 +104,13 @@ class RAGAgent:
         format_task = Task(
             description="Format and clean the meeting summary text",
             agent=self.formatter_agent,
-            context=raw_summary
+            context=[raw_summary]
         )
 
         analyze_task = Task(
             description="Analyze and structure the formatted content",
             agent=self.analyzer_agent,
-            context="Use the formatted text to create a well-structured summary"
+            context=[raw_summary]
         )
 
         # Create and run the crew
@@ -136,9 +136,28 @@ class RAGAgent:
 
         try:
             response = requests.get(url, headers=headers)
-            return response.text
-        except Exception as e:
+            response.raise_for_status()
+            
+            # Parse the JSON response
+            data = response.json()
+            
+            # Extract the summary text from the response
+            # Adjust this based on the actual structure of your API response
+            summary_text = data.get('summary', '')
+            
+            if not summary_text:
+                st.warning(f"No summary found for document {document_id}")
+                return None
+            
+            return summary_text
+            
+        except requests.exceptions.RequestException as e:
             error_msg = f"Error fetching meeting summary for document {document_id}: {str(e)}"
+            print(error_msg)
+            st.error(error_msg)
+            return None
+        except ValueError as e:
+            error_msg = f"Error parsing JSON response for document {document_id}: {str(e)}"
             print(error_msg)
             st.error(error_msg)
             return None
