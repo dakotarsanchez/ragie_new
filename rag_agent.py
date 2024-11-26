@@ -100,20 +100,20 @@ class RAGAgent:
         if not raw_summary:
             return None
 
-        # Ensure raw_summary is a string and wrap it in a list
-        context = [raw_summary] if isinstance(raw_summary, str) else []
+        # Always wrap raw_summary in a list
+        context = [raw_summary]
 
         # Create tasks for the crew
         format_task = Task(
             description="Format and clean the meeting summary text",
             agent=self.formatter_agent,
-            context=context  # Use the context list
+            context=context
         )
 
         analyze_task = Task(
             description="Analyze and structure the formatted content",
             agent=self.analyzer_agent,
-            context=context  # Use the context list
+            context=context
         )
 
         # Create and run the crew
