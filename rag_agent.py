@@ -245,3 +245,12 @@ class RAGAgent:
             print(error_msg)
             st.error(error_msg)
             return None
+
+class RouterAgent:
+    def __init__(self):
+        pass
+
+    def process_query(self, query: str) -> str:
+        """Process and return the query."""
+        print(f"RouterAgent received query: {query}")
+        return query
