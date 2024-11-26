@@ -113,7 +113,7 @@ class RAGAgent:
             elif intent == 'test_client_agreements':
                 print("Predicted intent: test_client_agreements")
                 agreement_chunks = self.client_agreement_agent.retrieve_chunks()
-            else:  # For unrecognized query category
+            elif intent == 'Query category not recognized. Please refine your query.':
                 print("Unrecognized query category. Invoking both agents.")
                 meeting_chunks = self.meeting_script_agent.retrieve_chunks()
                 agreement_chunks = self.client_agreement_agent.retrieve_chunks()
@@ -122,6 +122,8 @@ class RAGAgent:
 
         except Exception as e:
             print(f"Error during LLM prediction: {str(e)}")
+            print("Exception type:", type(e))
+            print("Exception args:", e.args)
             st.error("An error occurred while processing the query. Please try again later.")
             return []
 
