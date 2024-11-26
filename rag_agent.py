@@ -16,23 +16,33 @@ class RAGAgent:
     def get_recent_meeting_summaries(self) -> List[Dict]:
         """Fetch the 3 most recent meeting summaries from Ragie API."""
         if not self.api_key:
+            print("No API key found")
             return []
 
         url = "https://api.ragie.ai/documents"
         params = {
             "page_size": 3,
-            "filter": {"folder": {"$eq": "test_meetings"}}
+            "filter": "folder"
         }
         headers = {
             "accept": "application/json",
             "authorization": f"Bearer {self.api_key}"
         }
 
+        print(f"Making request to URL: {url}")
+        print(f"With params: {params}")
+        print(f"Headers (excluding auth token): {{'accept': {headers['accept']}}}")
+
         try:
             response = requests.get(url, headers=headers, params=params)
+            print(f"Response status code: {response.status_code}")
+            print(f"Response text: {response.text}")
+            
             response.raise_for_status()
             result = response.json()
             return result.get('documents', [])
         except Exception as e:
-            st.error(f"Error fetching meeting summaries: {str(e)}")
-            return []
+            error_msg = f"Error fetching meeting summaries: {str(e)}"
+            print(error_msg)
+            st.error(error_msg)
+            return [] 
