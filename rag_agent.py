@@ -12,13 +12,17 @@ class RAGAgent:
             self.ragie_api_key = st.secrets["RAGIE_API_KEY"]
             self.openai_api_key = st.secrets["OPENAI_API_KEY"]
             
+            # Debugging output to verify API key retrieval
+            print(f"RAGIE API Key: {self.ragie_api_key}")
+            print(f"OpenAI API Key: {self.openai_api_key}")
+            
             if not self.ragie_api_key or not self.openai_api_key:
                 raise ValueError("Required API keys not found in secrets")
                 
-            # Initialize LLM
+            # Initialize LLM with gpt-3.5-turbo
             self.llm = ChatOpenAI(
                 openai_api_key=self.openai_api_key,
-                model="gpt-4-turbo-preview"
+                model="gpt-3.5-turbo"
             )
             
             # Create specialized agents
