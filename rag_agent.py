@@ -19,22 +19,18 @@ class RAGAgent:
             print("No API key found")
             return []
 
-        url = "https://api.ragie.ai/documents"
-        params = {
-            "page_size": 3,
-            "filter": {"folder": {"$eq": "test_meetings"}}
-        }
+        url = "https://api.ragie.ai/documents?page_size=3&filter=%7B%22folder%22%3A%20%7B%22%24eq%22%3A%20%22test_meetings%22%7D%7D"
+        
         headers = {
             "accept": "application/json",
             "authorization": f"Bearer {self.api_key}"
         }
 
         print(f"Making request to URL: {url}")
-        print(f"With params: {params}")
         print(f"Headers (excluding auth token): {{'accept': {headers['accept']}}}")
 
         try:
-            response = requests.get(url, headers=headers, params=params)
+            response = requests.get(url, headers=headers)
             print(f"Response status code: {response.status_code}")
             print(f"Response text: {response.text}")
             
