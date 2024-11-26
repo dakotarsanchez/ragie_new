@@ -40,10 +40,11 @@ def main():
     if st.button("Submit Query"):
         st.write("Query submitted:", user_query)
         
-        # Save and print the query
+        # Save, print, and return the query
         try:
-            agent._route_query(user_query)
+            returned_query = agent._route_query(user_query)
             st.write("Query received and printed to console.")
+            st.write("Returned query:", returned_query)
         except Exception as e:
             st.error(f"An error occurred while processing the query: {str(e)}")
             st.write("Exception type:", type(e))
