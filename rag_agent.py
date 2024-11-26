@@ -86,19 +86,32 @@ class RAGAgent:
             description="Routes queries to the appropriate category"
         )
     
-    def _route_query(self, query: str) -> str:
-        """Determine the intent of the query and print it."""
+    def _route_query(self, query: str) -> List[Dict]:
+        """Determine the intent of the query and delegate to the appropriate agent(s)."""
         try:
             intent = self.llm.predict(
                 f"""Determine if this query is about meeting transcripts or client agreements. 
                 Respond with 'test_meeting', 'test_client_agreements', or 'both' if unclear: {query}"""
             )
             print(f"Predicted intent: {intent}")
-            return intent if intent in ['test_meeting', 'test_client_agreements'] else 'both'
+            
+            # Delegate to the appropriate agent(s) based on intent
+            if intent == 'test_meeting':
+                return self.meeting_script_agent.retrieve_chunks()
+            elif intent == 'test_client_agreements':
+                return self.client_agreement_agent.retrieve_chunks()
+            elif intent == 'both':
+                # Engage both agents and combine their results
+                meeting_chunks = self.meeting_script_agent.retrieve_chunks()
+                agreement_chunks = self.client_agreement_agent.retrieve_chunks()
+                return meeting_chunks + agreement_chunks
+            else:
+                # Handle unexpected intent
+                return []
         except Exception as e:
             print(f"Error during LLM prediction: {str(e)}")
             st.error("An error occurred while processing the query. Please try again later.")
-            return 'both'
+            return []
 
     def get_recent_meeting_summaries(self) -> List[Dict]:
         """Fetch and process the 3 most recent meeting summaries."""
