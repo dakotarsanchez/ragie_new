@@ -91,7 +91,7 @@ class RAGAgent:
         try:
             intent = self.llm.predict(
                 f"""Determine if this query is about meeting transcripts or client agreements. 
-                Respond with 'test_meeting', 'test_client_agreements', or 'both' if unclear: {query}"""
+                Respond with 'test_meeting', 'test_client_agreements', or 'Query category not recognized. Please refine your query.' if unclear: {query}"""
             )
             print(f"Predicted intent: {intent}")
             
@@ -100,8 +100,14 @@ class RAGAgent:
                 return self.meeting_script_agent.retrieve_chunks()
             elif intent == 'test_client_agreements':
                 return self.client_agreement_agent.retrieve_chunks()
+            elif intent == "Query category not recognized. Please refine your query.":
+                # Engage both agents if the category is not recognized
+                meeting_chunks = self.meeting_script_agent.retrieve_chunks()
+                agreement_chunks = self.client_agreement_agent.retrieve_chunks()
+                return meeting_chunks + agreement_chunks
             else:
-                # Treat any unexpected intent as 'both'
+                # Handle any other unexpected intents
+                st.warning("Unexpected intent received. Engaging both agents.")
                 meeting_chunks = self.meeting_script_agent.retrieve_chunks()
                 agreement_chunks = self.client_agreement_agent.retrieve_chunks()
                 return meeting_chunks + agreement_chunks
