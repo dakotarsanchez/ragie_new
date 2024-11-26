@@ -96,41 +96,19 @@ class RAGAgent:
         )
     
     def _route_query(self, query: str) -> List[Dict]:
-        """Determine the intent of the query and delegate to the appropriate agent(s)."""
+        """Save and print the user query for confirmation."""
         try:
-            # Attempt to use the evaluate method
-            try:
-                intent = self.llm.evaluate(
-                    f"""Determine if this query is about meeting transcripts or client agreements. 
-                    Respond with exactly one of the following: 'test_meeting', 'test_client_agreements', or 'Query category not recognized. Please refine your query.' 
-                    Do not provide any additional text or explanation. Query: {query}"""
-                )
-            except AttributeError:
-                # Fallback to using the predict method if evaluate is not available
-                intent = self.llm.predict(
-                    f"""Determine if this query is about meeting transcripts or client agreements. 
-                    Respond with exactly one of the following: 'test_meeting', 'test_client_agreements', or 'Query category not recognized. Please refine your query.' 
-                    Do not provide any additional text or explanation. Query: {query}"""
-                )
+            # Save the query to a variable
+            self.last_query = query
             
-            meeting_chunks = []
-            agreement_chunks = []
-
-            if intent == 'test_meeting':
-                print("Predicted intent: test_meeting")
-                meeting_chunks = self.meeting_script_agent.retrieve_chunks()
-            elif intent == 'test_client_agreements':
-                print("Predicted intent: test_client_agreements")
-                agreement_chunks = self.client_agreement_agent.retrieve_chunks()
-            elif intent == 'Query category not recognized. Please refine your query.':
-                print("Unrecognized query category. Invoking both agents.")
-                meeting_chunks = self.meeting_script_agent.retrieve_chunks()
-                agreement_chunks = self.client_agreement_agent.retrieve_chunks()
-
-            return meeting_chunks + agreement_chunks
+            # Print the query to confirm it is passed correctly
+            print(f"Received query: {self.last_query}")
+            
+            # Return an empty list as no processing is done
+            return []
 
         except Exception as e:
-            print(f"Error during query categorization: {str(e)}")
+            print(f"Error during query handling: {str(e)}")
             st.error("An error occurred while processing the query. Please try again later.")
             return []
 
