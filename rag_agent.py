@@ -22,7 +22,7 @@ class RAGAgent:
         url = "https://api.ragie.ai/documents"
         params = {
             "page_size": 3,
-            "filter": "folder"
+            "filter": {"folder": {"$eq": "test_meetings"}}
         }
         headers = {
             "accept": "application/json",
