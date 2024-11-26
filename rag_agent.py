@@ -103,19 +103,20 @@ class RAGAgent:
                 Respond with exactly one of the following: 'test_meeting', 'test_client_agreements', or 'Query category not recognized. Please refine your query.' 
                 Do not provide any additional text or explanation. Query: {query}"""
             )
-            print(f"Predicted intent: {intent}")
             
             meeting_chunks = []
             agreement_chunks = []
 
             if intent == 'test_meeting':
+                print("Predicted intent: test_meeting")
                 meeting_chunks = self.meeting_script_agent.retrieve_chunks()
             elif intent == 'test_client_agreements':
+                print("Predicted intent: test_client_agreements")
                 agreement_chunks = self.client_agreement_agent.retrieve_chunks()
-            else:  # For 'Query category not recognized. Please refine your query.'
+            else:  # For unrecognized query category
+                print("Unrecognized query category. Invoking both agents.")
                 meeting_chunks = self.meeting_script_agent.retrieve_chunks()
                 agreement_chunks = self.client_agreement_agent.retrieve_chunks()
-                print("Unrecognized query category. Invoking both agents.")
 
             return meeting_chunks + agreement_chunks
 
