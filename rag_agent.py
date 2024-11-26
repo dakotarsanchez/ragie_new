@@ -45,3 +45,26 @@ class RAGAgent:
             print(error_msg)
             st.error(error_msg)
             return [] 
+
+    def get_meeting_summary(self, document_id: str) -> Optional[str]:
+        """Fetch the summary for a specific meeting by document ID."""
+        if not self.api_key:
+            print("No API key found")
+            return None
+            
+        url = f"https://api.ragie.ai/documents/{document_id}/summary"
+        headers = {
+            "accept": "application/json",
+            "authorization": f"Bearer {self.api_key}"
+        }
+
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            result = response.json()
+            return result.get('summary')
+        except Exception as e:
+            error_msg = f"Error fetching meeting summary for document {document_id}: {str(e)}"
+            print(error_msg)
+            st.error(error_msg)
+            return None 
