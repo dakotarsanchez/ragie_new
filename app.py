@@ -20,9 +20,20 @@ def main():
             
             if meetings:
                 for meeting in meetings:
-                    with st.expander(f"Meeting: {meeting.get('name', 'Untitled')}"):
-                        st.write(f"ID: {meeting.get('id')}")
-                        st.write(f"Summary: {meeting.get('summary', 'No summary available')}")
+                    # Use a more descriptive title from the document metadata
+                    title = meeting.get('name', 'Untitled')
+                    created_at = meeting.get('created_at', 'Unknown date')
+                    
+                    with st.expander(f"Meeting: {title} ({created_at})"):
+                        # Display document metadata
+                        st.write(f"Document ID: {meeting.get('id')}")
+                        
+                        # Display the raw summary text
+                        summary = meeting.get('summary', 'No summary available')
+                        if summary:
+                            st.markdown(summary)  # Use markdown to render any formatting in the summary
+                        else:
+                            st.warning("No summary available for this meeting")
             else:
                 st.warning("No meetings found or error occurred while fetching meetings.")
 
