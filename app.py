@@ -1,5 +1,5 @@
 import streamlit as st
-from rag_agent import RAGAgent
+from rag_agent import RAGAgent, RouterAgent
 
 st.set_page_config(
     page_title="Meeting Summaries",
@@ -10,8 +10,9 @@ st.set_page_config(
 def main():
     st.title("Recent Meeting Summaries")
     
-    # Initialize RAGAgent
+    # Initialize RAGAgent and RouterAgent
     agent = RAGAgent()
+    router_agent = RouterAgent()
     
     # Add a refresh button
     if st.button("Refresh Meetings"):
@@ -45,6 +46,10 @@ def main():
             returned_query = agent._route_query(user_query)
             st.write("Query received and printed to console.")
             st.write("Returned query:", returned_query)
+            
+            # Use RouterAgent to process the query
+            processed_query = router_agent.process_query(returned_query)
+            st.write("RouterAgent processed query:", processed_query)
         except Exception as e:
             st.error(f"An error occurred while processing the query: {str(e)}")
             st.write("Exception type:", type(e))
