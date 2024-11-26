@@ -105,16 +105,17 @@ class RAGAgent:
             )
             print(f"Predicted intent: {intent}")
             
-            # Simplified logic for routing based on intent
-            if intent in ['test_meeting', 'Query category not recognized. Please refine your query.']:
-                meeting_chunks = self.meeting_script_agent.retrieve_chunks()
-            else:
-                meeting_chunks = []
+            meeting_chunks = []
+            agreement_chunks = []
 
-            if intent in ['test_client_agreements', 'Query category not recognized. Please refine your query.']:
+            if intent == 'test_meeting':
+                meeting_chunks = self.meeting_script_agent.retrieve_chunks()
+            elif intent == 'test_client_agreements':
                 agreement_chunks = self.client_agreement_agent.retrieve_chunks()
-            else:
-                agreement_chunks = []
+            else:  # For 'Query category not recognized. Please refine your query.'
+                meeting_chunks = self.meeting_script_agent.retrieve_chunks()
+                agreement_chunks = self.client_agreement_agent.retrieve_chunks()
+                print("Unrecognized query category. Invoking both agents.")
 
             return meeting_chunks + agreement_chunks
 
