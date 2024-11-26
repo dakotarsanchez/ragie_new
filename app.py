@@ -45,19 +45,25 @@ def main():
         st.write("Query submitted:", user_query)
         
         # Use the routing agent to determine the query category
-        category = agent.routing_agent.tools[0].func(user_query)
-        
-        if category == "test_meeting":
-            st.write("Routing to meeting transcripts processing...")
-            # Add logic to handle meeting transcripts queries
-        elif category == "test_client_agreements":
-            st.write("Routing to client agreements processing...")
-            # Add logic to handle client agreements queries
-        elif category == "both":
-            st.write("Query is ambiguous; processing for both meeting transcripts and client agreements...")
-            # Add logic to handle both categories
-        else:
-            st.warning("Query category not recognized. Please refine your query.")
+        try:
+            category = agent.routing_agent.tools[0].func(user_query)
+            st.write("Predicted category:", category)
+            
+            if category == "test_meeting":
+                st.write("Routing to meeting transcripts processing...")
+                # Add logic to handle meeting transcripts queries
+            elif category == "test_client_agreements":
+                st.write("Routing to client agreements processing...")
+                # Add logic to handle client agreements queries
+            elif category == "both":
+                st.write("Query is ambiguous; processing for both meeting transcripts and client agreements...")
+                # Add logic to handle both categories
+            else:
+                st.warning("Query category not recognized. Please refine your query.")
+        except Exception as e:
+            st.error(f"An error occurred while processing the query: {str(e)}")
+            st.write("Exception type:", type(e))
+            st.write("Exception args:", e.args)
 
 if __name__ == "__main__":
     main()
