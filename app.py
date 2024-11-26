@@ -43,7 +43,21 @@ def main():
     # Add a button to submit the query
     if st.button("Submit Query"):
         st.write("Query submitted:", user_query)
-        # Backend logic to handle the query will be added here
+        
+        # Use the routing agent to determine the query category
+        category = agent.routing_agent.tools[0].func(user_query)
+        
+        if category == "test_meeting":
+            st.write("Routing to meeting transcripts processing...")
+            # Add logic to handle meeting transcripts queries
+        elif category == "test_client_agreements":
+            st.write("Routing to client agreements processing...")
+            # Add logic to handle client agreements queries
+        elif category == "both":
+            st.write("Query is ambiguous; processing for both meeting transcripts and client agreements...")
+            # Add logic to handle both categories
+        else:
+            st.warning("Query category not recognized. Please refine your query.")
 
 if __name__ == "__main__":
     main()
