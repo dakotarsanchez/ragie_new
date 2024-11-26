@@ -1,7 +1,7 @@
-streamlit>=1.24.0
-requests>=231.0
-ython-dotenv>=1.0.0
-rewai==0.83.0
-angchain>=0.1.0
-angchain-openai>=0.0.2
+requests==2.31.0
+pythondotenv==1.0.0
+treamlit>=1.24.0
 penai>=1.12.0
+angchain==0.1.0
+angchain-openai==0.0.2
+rewai==0.83.0
