@@ -20,18 +20,14 @@ def main():
             
             if meetings:
                 for meeting in meetings:
-                    # Use a more descriptive title from the document metadata
                     title = meeting.get('name', 'Untitled')
                     created_at = meeting.get('created_at', 'Unknown date')
                     
                     with st.expander(f"Meeting: {title} ({created_at})"):
-                        # Display document metadata
                         st.write(f"Document ID: {meeting.get('id')}")
-                        
-                        # Display the raw summary text
                         summary = meeting.get('summary', 'No summary available')
                         if summary:
-                            st.markdown(summary)  # Use markdown to render any formatting in the summary
+                            st.markdown(summary)
                         else:
                             st.warning("No summary available for this meeting")
             else:
@@ -44,22 +40,10 @@ def main():
     if st.button("Submit Query"):
         st.write("Query submitted:", user_query)
         
-        # Use the routing agent to determine the query category
+        # Save and print the query
         try:
-            category = agent.routing_agent.tools[0].func(user_query)
-            st.write("Predicted category:", category)
-            
-            if category == "test_meeting":
-                st.write("Routing to meeting transcripts processing...")
-                # Add logic to handle meeting transcripts queries
-            elif category == "test_client_agreements":
-                st.write("Routing to client agreements processing...")
-                # Add logic to handle client agreements queries
-            elif category == "both":
-                st.write("Query is ambiguous; processing for both meeting transcripts and client agreements...")
-                # Add logic to handle both categories
-            else:
-                st.warning("Query category not recognized. Please refine your query.")
+            agent._route_query(user_query)
+            st.write("Query received and printed to console.")
         except Exception as e:
             st.error(f"An error occurred while processing the query: {str(e)}")
             st.write("Exception type:", type(e))
