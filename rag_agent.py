@@ -51,6 +51,15 @@ class RAGAgent:
                 tools=[self._create_routing_tool()]
             )
             
+            # Initialize the meeting script agent
+            self.meeting_script_agent = Agent(
+                role='Meeting Script Processor',
+                goal='Retrieve and process meeting scripts',
+                backstory='Expert in handling and analyzing meeting scripts',
+                llm=self.llm,
+                tools=[self._create_meeting_script_tool()]
+            )
+            
         except Exception as e:
             st.error(f"Error initializing agents: {str(e)}")
             self.ragie_api_key = None
@@ -95,22 +104,19 @@ class RAGAgent:
             )
             print(f"Predicted intent: {intent}")
             
-            # Delegate to the appropriate agent(s) based on intent
-            if intent == 'test_meeting':
-                return self.meeting_script_agent.retrieve_chunks()
-            elif intent == 'test_client_agreements':
-                return self.client_agreement_agent.retrieve_chunks()
-            elif intent == "Query category not recognized. Please refine your query.":
-                # Engage both agents if the category is not recognized
+            # Simplified logic for routing based on intent
+            if intent in ['test_meeting', 'Query category not recognized. Please refine your query.']:
                 meeting_chunks = self.meeting_script_agent.retrieve_chunks()
-                agreement_chunks = self.client_agreement_agent.retrieve_chunks()
-                return meeting_chunks + agreement_chunks
             else:
-                # Handle any other unexpected intents
-                st.warning("Unexpected intent received. Engaging both agents.")
-                meeting_chunks = self.meeting_script_agent.retrieve_chunks()
+                meeting_chunks = []
+
+            if intent in ['test_client_agreements', 'Query category not recognized. Please refine your query.']:
                 agreement_chunks = self.client_agreement_agent.retrieve_chunks()
-                return meeting_chunks + agreement_chunks
+            else:
+                agreement_chunks = []
+
+            return meeting_chunks + agreement_chunks
+
         except Exception as e:
             print(f"Error during LLM prediction: {str(e)}")
             st.error("An error occurred while processing the query. Please try again later.")
@@ -185,6 +191,67 @@ class RAGAgent:
             return None
         except ValueError as e:
             error_msg = f"Error parsing JSON response for document {document_id}: {str(e)}"
+            print(error_msg)
+            st.error(error_msg)
+            return None
+
+    def _create_meeting_script_tool(self):
+        """Create a tool for processing meeting scripts."""
+        return Tool(
+            name="process_meeting_script",
+            func=self.process_meeting_script,
+            description="Processes meeting scripts to extract key information"
+        )
+    
+    def retrieve_meeting_scripts(self) -> List[Dict]:
+        """Retrieve meeting scripts from a data source."""
+        # Example: Fetch meeting scripts from an API
+        url = "https://api.example.com/meeting_scripts"
+        headers = {
+            "accept": "application/json",
+            "authorization": f"Bearer {self.ragie_api_key}"
+        }
+        
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            scripts = response.json().get('scripts', [])
+            return scripts
+        except Exception as e:
+            error_msg = f"Error retrieving meeting scripts: {str(e)}"
+            print(error_msg)
+            st.error(error_msg)
+            return []
+    
+    def process_meeting_script(self, script_id: str) -> Optional[str]:
+        """Process a specific meeting script."""
+        # Fetch the raw script data
+        raw_script = self._fetch_raw_script(script_id)
+        
+        if raw_script:
+            # Example processing: Summarize the script
+            summary = self.llm.predict(
+                f"Summarize the following meeting script: {raw_script}"
+            )
+            return summary
+        else:
+            return None
+    
+    def _fetch_raw_script(self, script_id: str) -> Optional[str]:
+        """Fetch the raw meeting script from the data source."""
+        url = f"https://api.example.com/meeting_scripts/{script_id}"
+        headers = {
+            "accept": "application/json",
+            "authorization": f"Bearer {self.ragie_api_key}"
+        }
+        
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            return data.get('script', '')
+        except Exception as e:
+            error_msg = f"Error fetching meeting script for ID {script_id}: {str(e)}"
             print(error_msg)
             st.error(error_msg)
             return None
