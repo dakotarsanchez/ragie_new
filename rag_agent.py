@@ -100,7 +100,8 @@ class RAGAgent:
         try:
             intent = self.llm.predict(
                 f"""Determine if this query is about meeting transcripts or client agreements. 
-                Respond with 'test_meeting', 'test_client_agreements', or 'Query category not recognized. Please refine your query.' if unclear: {query}"""
+                Respond with exactly one of the following: 'test_meeting', 'test_client_agreements', or 'Query category not recognized. Please refine your query.' 
+                Do not provide any additional text or explanation. Query: {query}"""
             )
             print(f"Predicted intent: {intent}")
             
