@@ -95,36 +95,9 @@ class RAGAgent:
             return []
 
     def process_meeting_summary(self, document_id: str) -> Optional[str]:
-        """Process meeting summary using the agent crew."""
+        """Fetch and return the raw meeting summary."""
         raw_summary = self._fetch_raw_summary(document_id)
-        if not raw_summary:
-            return None
-
-        # Always wrap raw_summary in a list
-        context = [raw_summary]
-
-        # Create tasks for the crew
-        format_task = Task(
-            description="Format and clean the meeting summary text",
-            agent=self.formatter_agent,
-            context=context
-        )
-
-        analyze_task = Task(
-            description="Analyze and structure the formatted content",
-            agent=self.analyzer_agent,
-            context=context
-        )
-
-        # Create and run the crew
-        crew = Crew(
-            agents=[self.formatter_agent, self.analyzer_agent],
-            tasks=[format_task, analyze_task],
-            verbose=True
-        )
-
-        result = crew.kickoff()
-        return result
+        return raw_summary
 
     def _fetch_raw_summary(self, document_id: str) -> Optional[str]:
         """Fetch the raw summary from the API."""
