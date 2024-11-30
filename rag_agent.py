@@ -428,11 +428,12 @@ class RouterAgent:
         if "meeting notes" in intent:
             print("Triggering Meeting Notes Agent")
             result = self.rag_agent.meeting_notes_agent.tools[0].func(query)
-            print(f"Meeting Notes Agent Output: {result}")
+            # Do not print the output from the meeting notes agent
             return result
         elif "client agreements" in intent:
             print("Triggering Client Agreement Agent")
             result = self.rag_agent.client_agreement_agent.tools[0].func(query)
+            # Print the output from the client agreements agent
             print(f"Client Agreement Agent Output: {result}")
             return result
         else:
