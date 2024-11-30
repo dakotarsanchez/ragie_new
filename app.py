@@ -10,9 +10,11 @@ st.set_page_config(
 def main():
     st.title("Recent Meeting Summaries")
     
-    # Initialize RAGAgent and RouterAgent
+    # Initialize RAGAgent
     agent = RAGAgent()
-    router_agent = RouterAgent()
+    
+    # Initialize RouterAgent with the intent determination agent
+    router_agent = RouterAgent(intent_determination_agent=agent.intent_determination_agent)
     
     # Add a refresh button
     if st.button("Refresh Meetings"):
@@ -41,14 +43,9 @@ def main():
     if st.button("Submit Query"):
         st.write("Query submitted:", user_query)
         
-        # Save, print, and return the query
+        # Use RouterAgent to process the query
         try:
-            returned_query = agent._route_query(user_query)
-            st.write("Query received and printed to console.")
-            st.write("Returned query:", returned_query)
-            
-            # Use RouterAgent to process the query
-            processed_query = router_agent.process_query(returned_query)
+            processed_query = router_agent.process_query(user_query)
             st.write("RouterAgent processed query:", processed_query)
         except Exception as e:
             st.error(f"An error occurred while processing the query: {str(e)}")
