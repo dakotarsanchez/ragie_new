@@ -87,6 +87,15 @@ class RAGAgent:
                 tools=[self._create_client_agreement_tool()]
             )
             
+            # Initialize the summarizer agent
+            self.summarizer_agent = Agent(
+                role='Summarizer',
+                goal='Summarize relevant meeting notes and client agreements',
+                backstory='Expert in synthesizing information from multiple sources',
+                llm=self.llm,
+                tools=[self._create_summarizer_tool()]
+            )
+            
         except Exception as e:
             st.error(f"Error initializing agents: {str(e)}")
             self.ragie_api_key = None
@@ -414,6 +423,22 @@ class RAGAgent:
             st.error(error_msg)
             return None
 
+    def _create_summarizer_tool(self):
+        """Create a tool for summarizing information."""
+        return Tool(
+            name="summarize_information",
+            func=self.summarize_information,
+            description="Summarizes meeting notes and client agreements"
+        )
+
+    def summarize_information(self, meeting_notes: str, client_agreements: str) -> str:
+        """Summarize the provided meeting notes and client agreements."""
+        combined_text = f"Meeting Notes:\n{meeting_notes}\n\nClient Agreements:\n{client_agreements}"
+        summary = self.llm.invoke(
+            f"Summarize the following information into a concise and useful output: {combined_text}"
+        )
+        return summary
+
 class RouterAgent:
     def __init__(self, rag_agent: RAGAgent):
         self.rag_agent = rag_agent
@@ -424,18 +449,20 @@ class RouterAgent:
         intent = self.rag_agent.intent_determination_agent.tools[0].func(query)
         print(f"Determined intent: {intent}")
 
+        meeting_notes_result = ""
+        client_agreements_result = ""
+
         # Trigger the appropriate agent based on the intent
         if "meeting notes" in intent:
             print("Triggering Meeting Notes Agent")
-            result = self.rag_agent.meeting_notes_agent.tools[0].func(query)
-            # Do not print the output from the meeting notes agent
-            return result
-        elif "client agreements" in intent:
+            meeting_notes_result = self.rag_agent.meeting_notes_agent.tools[0].func(query)
+        
+        if "client agreements" in intent:
             print("Triggering Client Agreement Agent")
-            result = self.rag_agent.client_agreement_agent.tools[0].func(query)
-            # Print the output from the client agreements agent
-            print(f"Client Agreement Agent Output: {result}")
-            return result
-        else:
-            print("No specific agent triggered")
-            return "No specific agent triggered"
+            client_agreements_result = self.rag_agent.client_agreement_agent.tools[0].func(query)
+            print(f"Client Agreement Agent Output: {client_agreements_result}")
+
+        # Use the summarizer agent to create a useful output
+        summary = self.rag_agent.summarizer_agent.tools[0].func(meeting_notes_result, client_agreements_result)
+        print(f"Summarizer Agent Output: {summary}")
+        return summary
