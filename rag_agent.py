@@ -77,7 +77,7 @@ class RAGAgent:
         """Create a tool for text formatting."""
         return Tool(
             name="format_text",
-            func=lambda text: self.llm.predict(
+            func=lambda text: self.llm.invoke(
                 f"""Format this text for optimal readability. Fix any merged words, 
                 standardize bullet points, and ensure proper line breaks while 
                 preserving all information: {text}"""
@@ -89,7 +89,7 @@ class RAGAgent:
         """Create a tool for content analysis."""
         return Tool(
             name="analyze_content",
-            func=lambda text: self.llm.predict(
+            func=lambda text: self.llm.invoke(
                 f"""Analyze this meeting summary and structure it logically with 
                 clear sections and proper formatting: {text}"""
             ),
@@ -229,7 +229,7 @@ class RAGAgent:
         
         if raw_script:
             # Example processing: Summarize the script
-            summary = self.llm.predict(
+            summary = self.llm.invoke(
                 f"Summarize the following meeting script: {raw_script}"
             )
             return summary
@@ -267,7 +267,7 @@ class RAGAgent:
         """Use the LLM to determine the intent of the query."""
         try:
             # Use the LLM to predict the intent
-            intent = self.llm.predict(
+            intent = self.llm.invoke(
                 f"""Determine the intent of the following query. Is it related to meeting notes, 
                 client agreements, or both? Provide a clear answer: {query}"""
             )
