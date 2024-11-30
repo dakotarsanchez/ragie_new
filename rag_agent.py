@@ -288,7 +288,9 @@ class RAGAgent:
                 f"""Determine the intent of the following query. Is it related to meeting notes, 
                 client agreements, or both? Provide a clear answer: {query}"""
             )
-            intent = ai_message.content.strip().lower()
+            
+            # Assuming ai_message is a dictionary with a 'content' key
+            intent = ai_message.get('content', '').strip().lower()
 
             # Trigger agents based on the determined intent
             if "meeting notes" in intent:
