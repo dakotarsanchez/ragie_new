@@ -375,11 +375,44 @@ class RAGAgent:
             return None
 
     def process_client_agreements(self, query: str) -> Optional[str]:
-        """Process client agreements based on the query."""
-        # Implement the logic for processing client agreements
+        """Process client agreements based on the query by querying the Ragie AI API."""
         print(f"Processing client agreements for query: {query}")
-        # Example processing logic
-        return "Processed client agreements"
+        
+        # Define the API endpoint and payload
+        url = "https://api.ragie.ai/retrievals"
+        payload = {
+            "rerank": True,
+            "query": query,
+            "top_k": 8,
+            "filter": {"folder": {"$eq": "test_client_agreements"}}
+        }
+        headers = {
+            "accept": "application/json",
+            "content-type": "application/json",
+            "authorization": f"Bearer {self.ragie_api_key}"
+        }
+        
+        try:
+            # Make the API request
+            response = requests.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            output = response.json()
+            
+            # Extract and return the relevant chunks
+            scored_chunks = output.get('scored_chunks', [])
+            relevant_texts = [chunk['text'] for chunk in scored_chunks]
+            return "\n".join(relevant_texts)
+        
+        except requests.exceptions.HTTPError as err:
+            error_msg = f"HTTP error occurred: {err}"
+            print(error_msg)
+            st.error(error_msg)
+            return None
+        except Exception as err:
+            error_msg = f"Other error occurred: {err}"
+            print(error_msg)
+            st.error(error_msg)
+            return None
 
 class RouterAgent:
     def __init__(self, rag_agent: RAGAgent):
