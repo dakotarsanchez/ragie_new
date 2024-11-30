@@ -431,12 +431,22 @@ class RAGAgent:
             description="Summarizes meeting notes and client agreements"
         )
 
-    def summarize_information(self, meeting_notes: str, client_agreements: str) -> str:
-        """Summarize the provided meeting notes and client agreements."""
-        combined_text = f"Meeting Notes:\n{meeting_notes}\n\nClient Agreements:\n{client_agreements}"
-        summary = self.llm.invoke(
-            f"Summarize the following information into a concise and useful output: {combined_text}"
+    def summarize_information(self, query: str, meeting_notes: str, client_agreements: str) -> str:
+        """Summarize the provided meeting notes and client agreements with respect to the user's query."""
+        # Provide context about the nature of the chunks and include the user's query
+        prompt = (
+            f"You are provided with a user query and two types of information:\n"
+            f"User Query: {query}\n"
+            "1. Meeting scripts without client details, which are internal discussions and plans.\n"
+            "2. Client agreements, which are contracts between our clients and their customers.\n"
+            "Your task is to synthesize this information to best inform the user based on their query. "
+            "Consider the context and relevance of each piece of information to provide a concise and useful summary."
+            "\n\nMeeting Notes:\n"
+            f"{meeting_notes}\n\nClient Agreements:\n{client_agreements}"
         )
+        
+        # Invoke the language model with the improved prompt
+        summary = self.llm.invoke(prompt)
         return summary
 
 class RouterAgent:
@@ -463,7 +473,7 @@ class RouterAgent:
             print(f"Client Agreement Agent Output: {client_agreements_result}")
 
         # Use the summarizer agent to create a useful output
-        summary = self.rag_agent.summarizer_agent.tools[0].func(meeting_notes_result, client_agreements_result)
+        summary = self.rag_agent.summarizer_agent.tools[0].func(query, meeting_notes_result, client_agreements_result)
         print(f"Summarizer Agent Output: {summary}")
         
         # Return the summarized output
