@@ -229,7 +229,7 @@ class RAGAgent:
         
         if raw_script:
             # Example processing: Summarize the script
-            summary = self.llm.invoke(
+            summary = self.llm.predict(
                 f"Summarize the following meeting script: {raw_script}"
             )
             return summary
@@ -267,10 +267,12 @@ class RAGAgent:
         """Use the LLM to determine the intent of the query."""
         try:
             # Use the LLM to predict the intent
-            intent = self.llm.invoke(
+            ai_message = self.llm.invoke(
                 f"""Determine the intent of the following query. Is it related to meeting notes, 
                 client agreements, or both? Provide a clear answer: {query}"""
             )
+            # Access the text content of the AIMessage object
+            intent = ai_message.content
             return intent.strip()
         except Exception as e:
             error_msg = f"Error determining intent: {str(e)}"
