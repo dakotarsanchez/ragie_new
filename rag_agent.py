@@ -445,7 +445,7 @@ class RouterAgent:
 
     def process_query(self, query: str) -> str:
         """Process the query using the intent determination agent."""
-        #print(f"RouterAgent received query: {query}")
+        print(f"RouterAgent received query: {query}")
         intent = self.rag_agent.intent_determination_agent.tools[0].func(query)
         print(f"Determined intent: {intent}")
 
@@ -465,4 +465,6 @@ class RouterAgent:
         # Use the summarizer agent to create a useful output
         summary = self.rag_agent.summarizer_agent.tools[0].func(meeting_notes_result, client_agreements_result)
         print(f"Summarizer Agent Output: {summary}")
+        
+        # Return the summarized output
         return summary
