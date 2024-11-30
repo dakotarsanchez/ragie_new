@@ -60,6 +60,15 @@ class RAGAgent:
                 tools=[self._create_meeting_script_tool()]
             )
             
+            # Initialize the intent determination agent
+            self.intent_determination_agent = Agent(
+                role='Intent Determination',
+                goal='Determine if a query is related to meeting notes, client agreements, or both',
+                backstory='Expert in understanding and categorizing user queries',
+                llm=self.llm,
+                tools=[self._create_intent_determination_tool()]
+            )
+            
         except Exception as e:
             st.error(f"Error initializing agents: {str(e)}")
             self.ragie_api_key = None
@@ -246,11 +255,34 @@ class RAGAgent:
             st.error(error_msg)
             return None
 
+    def _create_intent_determination_tool(self):
+        """Create a tool for determining the intent of a query."""
+        return Tool(
+            name="determine_intent",
+            func=self.determine_intent,
+            description="Determines if a query is related to meeting notes, client agreements, or both"
+        )
+
+    def determine_intent(self, query: str) -> str:
+        """Use the LLM to determine the intent of the query."""
+        try:
+            # Use the LLM to predict the intent
+            intent = self.llm.predict(
+                f"""Determine the intent of the following query. Is it related to meeting notes, 
+                client agreements, or both? Provide a clear answer: {query}"""
+            )
+            return intent.strip()
+        except Exception as e:
+            error_msg = f"Error determining intent: {str(e)}"
+            print(error_msg)
+            st.error(error_msg)
+            return "Error determining intent"
+
 class RouterAgent:
-    def __init__(self):
-        pass
+    def __init__(self, intent_determination_agent: Agent):
+        self.intent_determination_agent = intent_determination_agent
 
     def process_query(self, query: str) -> str:
-        """Process and return the query."""
+        """Process the query using the intent determination agent."""
         print(f"RouterAgent received query: {query}")
-        return query
+        return self.intent_determination_agent.tools[0].func(query)
