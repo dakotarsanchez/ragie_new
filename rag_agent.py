@@ -69,6 +69,24 @@ class RAGAgent:
                 tools=[self._create_intent_determination_tool()]
             )
             
+            # Initialize the meeting notes agent
+            self.meeting_notes_agent = Agent(
+                role='Meeting Notes Processor',
+                goal='Process and analyze meeting notes',
+                backstory='Expert in handling meeting notes',
+                llm=self.llm,
+                tools=[self._create_meeting_notes_tool()]
+            )
+
+            # Initialize the client agreement agent
+            self.client_agreement_agent = Agent(
+                role='Client Agreement Processor',
+                goal='Process and analyze client agreements',
+                backstory='Expert in handling client agreements',
+                llm=self.llm,
+                tools=[self._create_client_agreement_tool()]
+            )
+            
         except Exception as e:
             st.error(f"Error initializing agents: {str(e)}")
             self.ragie_api_key = None
@@ -264,21 +282,62 @@ class RAGAgent:
         )
 
     def determine_intent(self, query: str) -> str:
-        """Use the LLM to determine the intent of the query."""
+        """Use the LLM to determine the intent of the query and trigger appropriate agents."""
         try:
-            # Use the LLM to predict the intent
             ai_message = self.llm.invoke(
                 f"""Determine the intent of the following query. Is it related to meeting notes, 
                 client agreements, or both? Provide a clear answer: {query}"""
             )
-            # Access the text content of the AIMessage object
-            intent = ai_message.content
-            return intent.strip()
+            intent = ai_message.content.strip().lower()
+
+            # Trigger agents based on the determined intent
+            if "meeting notes" in intent:
+                print("Triggering Meeting Notes Agent")
+                self.meeting_notes_agent.tools[0].func(query)
+            if "client agreements" in intent:
+                print("Triggering Client Agreement Agent")
+                self.client_agreement_agent.tools[0].func(query)
+            if "both" in intent or "unclear" in intent:
+                print("Triggering both Meeting Notes and Client Agreement Agents")
+                self.meeting_notes_agent.tools[0].func(query)
+                self.client_agreement_agent.tools[0].func(query)
+
+            return intent
         except Exception as e:
             error_msg = f"Error determining intent: {str(e)}"
             print(error_msg)
             st.error(error_msg)
             return "Error determining intent"
+
+    def _create_meeting_notes_tool(self):
+        """Create a tool for processing meeting notes."""
+        return Tool(
+            name="process_meeting_notes",
+            func=self.process_meeting_notes,
+            description="Processes meeting notes to extract key information"
+        )
+
+    def _create_client_agreement_tool(self):
+        """Create a tool for processing client agreements."""
+        return Tool(
+            name="process_client_agreements",
+            func=self.process_client_agreements,
+            description="Processes client agreements to extract key information"
+        )
+
+    def process_meeting_notes(self, query: str) -> Optional[str]:
+        """Process meeting notes based on the query."""
+        # Implement the logic for processing meeting notes
+        print(f"Processing meeting notes for query: {query}")
+        # Example processing logic
+        return "Processed meeting notes"
+
+    def process_client_agreements(self, query: str) -> Optional[str]:
+        """Process client agreements based on the query."""
+        # Implement the logic for processing client agreements
+        print(f"Processing client agreements for query: {query}")
+        # Example processing logic
+        return "Processed client agreements"
 
 class RouterAgent:
     def __init__(self, intent_determination_agent: Agent):
