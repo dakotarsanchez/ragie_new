@@ -388,4 +388,20 @@ class RouterAgent:
     def process_query(self, query: str) -> str:
         """Process the query using the intent determination agent."""
         print(f"RouterAgent received query: {query}")
-        return self.intent_determination_agent.tools[0].func(query)
+        intent = self.intent_determination_agent.tools[0].func(query)
+        print(f"Determined intent: {intent}")
+
+        # Trigger the appropriate agent based on the intent
+        if "meeting notes" in intent:
+            print("Triggering Meeting Notes Agent")
+            result = self.intent_determination_agent.meeting_notes_agent.tools[0].func(query)
+            print(f"Meeting Notes Agent Output: {result}")
+            return result
+        elif "client agreements" in intent:
+            print("Triggering Client Agreement Agent")
+            result = self.intent_determination_agent.client_agreement_agent.tools[0].func(query)
+            print(f"Client Agreement Agent Output: {result}")
+            return result
+        else:
+            print("No specific agent triggered")
+            return "No specific agent triggered"
