@@ -46,7 +46,7 @@ def main():
         # Use RouterAgent to process the query
         try:
             processed_query = router_agent.process_query(user_query)
-            st.write("RouterAgent processed query:", processed_query)
+            st.write("Summarizer Agent Output:", processed_query)
         except Exception as e:
             st.error(f"An error occurred while processing the query: {str(e)}")
             st.write("Exception type:", type(e))
