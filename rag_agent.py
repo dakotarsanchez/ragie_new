@@ -289,8 +289,15 @@ class RAGAgent:
                 client agreements, or both? Provide a clear answer: {query}"""
             )
             
-            # Assuming ai_message is a dictionary with a 'content' key
-            intent = ai_message.get('content', '').strip().lower()
+            # Debugging: Print the ai_message to understand its structure
+            print(f"AI Message: {ai_message}")
+
+            # Assuming ai_message is a string or has a content attribute
+            if isinstance(ai_message, str):
+                intent = ai_message.strip().lower()
+            else:
+                # Adjust this based on the actual structure of ai_message
+                intent = ai_message.content.strip().lower()
 
             # Trigger agents based on the determined intent
             if "meeting notes" in intent:
