@@ -13,8 +13,8 @@ def main():
     # Initialize RAGAgent
     agent = RAGAgent()
     
-    # Initialize RouterAgent with the intent determination agent
-    router_agent = RouterAgent(intent_determination_agent=agent.intent_determination_agent)
+    # Initialize RouterAgent with the RAGAgent instance
+    router_agent = RouterAgent(rag_agent=agent)
     
     # Add a refresh button
     if st.button("Refresh Meetings"):
