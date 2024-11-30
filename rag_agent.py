@@ -445,7 +445,7 @@ class RouterAgent:
 
     def process_query(self, query: str) -> str:
         """Process the query using the intent determination agent."""
-        print(f"RouterAgent received query: {query}")
+        #print(f"RouterAgent received query: {query}")
         intent = self.rag_agent.intent_determination_agent.tools[0].func(query)
         print(f"Determined intent: {intent}")
 
