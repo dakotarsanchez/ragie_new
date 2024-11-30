@@ -382,24 +382,24 @@ class RAGAgent:
         return "Processed client agreements"
 
 class RouterAgent:
-    def __init__(self, intent_determination_agent: Agent):
-        self.intent_determination_agent = intent_determination_agent
+    def __init__(self, rag_agent: RAGAgent):
+        self.rag_agent = rag_agent
 
     def process_query(self, query: str) -> str:
         """Process the query using the intent determination agent."""
         print(f"RouterAgent received query: {query}")
-        intent = self.intent_determination_agent.tools[0].func(query)
+        intent = self.rag_agent.intent_determination_agent.tools[0].func(query)
         print(f"Determined intent: {intent}")
 
         # Trigger the appropriate agent based on the intent
         if "meeting notes" in intent:
             print("Triggering Meeting Notes Agent")
-            result = self.intent_determination_agent.meeting_notes_agent.tools[0].func(query)
+            result = self.rag_agent.meeting_notes_agent.tools[0].func(query)
             print(f"Meeting Notes Agent Output: {result}")
             return result
         elif "client agreements" in intent:
             print("Triggering Client Agreement Agent")
-            result = self.intent_determination_agent.client_agreement_agent.tools[0].func(query)
+            result = self.rag_agent.client_agreement_agent.tools[0].func(query)
             print(f"Client Agreement Agent Output: {result}")
             return result
         else:
